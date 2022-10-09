@@ -12,5 +12,5 @@ resource "aws_dynamodb_table" "users" {
 resource "aws_ssm_parameter" "dynamodb_users_table" {
   name  = "${var.environment}-dynamodb-users-table"
   type  = "String"
-  value = "${aws_dynamodb_table.users.name}"
+  value = aws_dynamodb_table.users.name
 }
