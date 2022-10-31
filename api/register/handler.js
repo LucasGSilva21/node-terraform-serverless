@@ -1,18 +1,30 @@
 'use strict';
 
-module.exports.register = async (event) => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: process.env.DYNAMODB_USERS,
-        input: event,
-      },
-      null,
-      2
-    ),
-  };
+const AWS = require('aws-sdk')
+const bcrypt = require('bcryptjs')
+const { v4: uuid } = require('uuid')
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+AWS.config.update({
+  region: process.env.AWS_REGION
+})
+
+const documentClient = new AWS.DynamoDB.DocumentClient()
+
+module.exports.register = async (event) => {
+  const body = JSON.parse(event.body)
+
+  await documentClient.put({
+    TableName: process.env.DYNAMODB_USERS,
+    Item: {
+      id: uuid(),
+      name: body.name,
+      email: body.email,
+      password: bcrypt.hashSync(body.password, 10)
+    }
+  }).promise()
+
+  return {
+    statusCode: 201,
+    body: JSON.stringify({ message: 'User created successfully' })
+  }
 };
