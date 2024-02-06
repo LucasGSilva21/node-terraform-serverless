@@ -28,11 +28,14 @@ jobs:
       - name: Terraform Init
         id: init
         run: |
+          cd terraform/environments/dev
           terraform fmt
           terraform init -upgrade
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: |
+          cd terraform/environments/dev
+          terraform apply -auto-approve
 
       - name: serverless deploy
         uses: serverless/github-action@v3.2
