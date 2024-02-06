@@ -1,10 +1,10 @@
 service: api
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs20.x
 
   stage: dev
   region: us-east-1
@@ -14,9 +14,13 @@ provider:
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  memorySize:
+    dev: 128
+    prod: 2048
 
 functions:
   register:
+    memorySize: ${self:custom.memorySize.${self:custom.stage}}
     role: ${ssm:${self:custom.stage}-register-iam-role}
     handler: register/handler.register
     events:
